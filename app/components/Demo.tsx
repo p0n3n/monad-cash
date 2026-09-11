@@ -140,7 +140,7 @@ export default function Demo() {
                   <form onSubmit={handleCreateGift} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                        Recipient's wallet address
+                        Recipient&apos;s wallet address
                       </label>
                       <input
                         type="text"
