@@ -85,7 +85,6 @@ export default function Demo() {
     setFormError("");
     setIsTransactionPending(true);
     try {
-      // Read the ID this gift will get, so we can build its link right away.
       let predictedGiftId: bigint | null = null;
       try {
         predictedGiftId = (await publicClient.readContract({
@@ -160,20 +159,28 @@ export default function Demo() {
     }
   }
 
+  function openWhatsapp() {
+    window.open(whatsappUrl, "_blank");
+  }
+
+  function openExplorer() {
+    window.open(monadExplorerUrl, "_blank");
+  }
+
   return (
     <>
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap");
+        @import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap");
 
         @keyframes gc-glow {
           0%,
           100% {
-            opacity: 0.55;
+            opacity: 0.5;
             transform: scale(1);
           }
           50% {
             opacity: 1;
-            transform: scale(1.06);
+            transform: scale(1.08);
           }
         }
         @keyframes gc-float {
@@ -182,11 +189,43 @@ export default function Demo() {
             transform: translateY(0px);
           }
           50% {
-            transform: translateY(-6px);
+            transform: translateY(-8px);
+          }
+        }
+        @keyframes gc-drift-a {
+          0%,
+          100% {
+            transform: translate(0, 0) scale(1);
+          }
+          50% {
+            transform: translate(30px, -20px) scale(1.1);
+          }
+        }
+        @keyframes gc-drift-b {
+          0%,
+          100% {
+            transform: translate(0, 0) scale(1);
+          }
+          50% {
+            transform: translate(-25px, 25px) scale(1.05);
+          }
+        }
+        @keyframes gc-pulse-dot {
+          0%,
+          80%,
+          100% {
+            opacity: 0.25;
+          }
+          40% {
+            opacity: 1;
           }
         }
         .gc-serif {
-          font-family: "Fraunces", ui-serif, Georgia, serif;
+          font-family: "Newsreader", ui-serif, Georgia, serif;
+        }
+        .gc-serif-italic {
+          font-family: "Newsreader", ui-serif, Georgia, serif;
+          font-style: italic;
         }
         .gc-sans {
           font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -197,10 +236,35 @@ export default function Demo() {
         .gc-envelope {
           animation: gc-float 4s ease-in-out infinite;
         }
+        .gc-blob-a {
+          animation: gc-drift-a 9s ease-in-out infinite;
+        }
+        .gc-blob-b {
+          animation: gc-drift-b 11s ease-in-out infinite;
+        }
+        .gc-dot-1 {
+          animation: gc-pulse-dot 1.4s ease-in-out infinite;
+        }
+        .gc-dot-2 {
+          animation: gc-pulse-dot 1.4s ease-in-out 0.2s infinite;
+        }
+        .gc-dot-3 {
+          animation: gc-pulse-dot 1.4s ease-in-out 0.4s infinite;
+        }
       `}</style>
 
-      <section className="gc-sans bg-[#1E2230] rounded-2xl shadow-xl p-6 md:p-10 border border-[#333850]">
-        <div className="max-w-md mx-auto">
+      <section className="gc-sans relative bg-[#1E2230] rounded-2xl shadow-2xl p-6 md:p-10 border border-[#333850] overflow-hidden">
+        {/* ambient drifting glow, purely decorative */}
+        <div
+          className="gc-blob-a pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full opacity-20 blur-3xl"
+          style={{ background: "radial-gradient(circle, #E8A33D, transparent 70%)" }}
+        />
+        <div
+          className="gc-blob-b pointer-events-none absolute -bottom-20 -left-16 w-64 h-64 rounded-full opacity-20 blur-3xl"
+          style={{ background: "radial-gradient(circle, #4C5A9E, transparent 70%)" }}
+        />
+
+        <div className="relative max-w-md mx-auto">
           {ready ? (
             <>
               {authenticated && user ? (
@@ -218,8 +282,10 @@ export default function Demo() {
                     )}
                   </div>
 
-                  <h2 className="gc-serif text-2xl md:text-3xl font-semibold text-[#F1EFEA] mb-2">
-                    Send something that arrives right on time
+                  <h2 className="gc-serif text-2xl md:text-3xl font-semibold text-[#F1EFEA] mb-2 leading-tight">
+                    Send something that{" "}
+                    <span className="gc-serif-italic text-[#E8A33D]">arrives</span> right
+                    on time
                   </h2>
                   <p className="text-[#9098B0] text-sm mb-8">
                     Lock it now. It unlocks itself, exactly when it matters.
@@ -291,7 +357,7 @@ export default function Demo() {
                       <button
                         type="submit"
                         disabled={isTransactionPending || !smartAccountReady}
-                        className="w-full bg-[#E8A33D] text-[#14171F] px-6 py-3.5 rounded-xl font-semibold hover:brightness-110 active:brightness-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#E8A33D]/10"
+                        className="w-full bg-[#E8A33D] text-[#14171F] px-6 py-3.5 rounded-xl font-semibold hover:brightness-110 active:brightness-95 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#E8A33D]/20"
                       >
                         {isTransactionPending ? "Sending…" : "Send Gift"}
                       </button>
@@ -319,14 +385,16 @@ export default function Demo() {
                     Monad Cash
                   </span>
                   <h1 className="gc-serif text-3xl md:text-4xl font-semibold text-[#F1EFEA] mb-3 leading-tight">
-                    Send something that arrives right on time
+                    Send something that{" "}
+                    <span className="gc-serif-italic text-[#E8A33D]">arrives</span> right
+                    on time
                   </h1>
                   <p className="text-[#9098B0] text-sm mb-8 max-w-xs mx-auto">
                     Lock money for someone you care about. It stays untouched until the exact moment it matters.
                   </p>
                   <button
                     onClick={login}
-                    className="w-full bg-[#E8A33D] text-[#14171F] px-6 py-3.5 rounded-xl font-semibold hover:brightness-110 active:brightness-95 transition-all duration-150 shadow-lg shadow-[#E8A33D]/10"
+                    className="w-full bg-[#E8A33D] text-[#14171F] px-6 py-3.5 rounded-xl font-semibold hover:brightness-110 active:brightness-95 transition-all duration-150 shadow-lg shadow-[#E8A33D]/20"
                   >
                     Get Started
                   </button>
@@ -335,11 +403,19 @@ export default function Demo() {
               )}
             </>
           ) : (
-            <>
-              <div className="w-3/4 h-8 bg-[#333850] rounded mb-6 animate-pulse mx-auto" />
-              <div className="w-2/3 h-4 bg-[#333850] rounded mb-6 animate-pulse mx-auto" />
-              <div className="w-full h-12 bg-[#333850] rounded-xl animate-pulse" />
-            </>
+            <div className="flex flex-col items-center justify-center py-10">
+              <div className="gc-envelope mb-4">
+                <svg width="40" height="40" viewBox="0 0 56 56" fill="none">
+                  <rect x="6" y="14" width="44" height="32" rx="4" stroke="#E8A33D" strokeWidth="2" opacity="0.6" />
+                  <path d="M8 16L28 34L48 16" stroke="#E8A33D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+                </svg>
+              </div>
+              <div className="flex gap-1.5">
+                <span className="gc-dot-1 w-1.5 h-1.5 rounded-full bg-[#E8A33D]" />
+                <span className="gc-dot-2 w-1.5 h-1.5 rounded-full bg-[#E8A33D]" />
+                <span className="gc-dot-3 w-1.5 h-1.5 rounded-full bg-[#E8A33D]" />
+              </div>
+            </div>
           )}
         </div>
 
@@ -361,14 +437,12 @@ export default function Demo() {
 
                 {giftLink ? (
                   <div className="space-y-3 mb-2">
-                    
-                      <a href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full bg-[#E8A33D] text-[#14171F] px-4 py-3 rounded-xl font-semibold hover:brightness-110 transition-all duration-150"
+                    <button
+                      onClick={openWhatsapp}
+                      className="w-full bg-[#E8A33D] text-[#14171F] px-4 py-3 rounded-xl font-semibold hover:brightness-110 transition-all duration-150"
                     >
                       Share on WhatsApp
-                    </a>
+                    </button>
                     <button
                       onClick={copyGiftLink}
                       className="w-full bg-transparent border border-[#333850] text-[#F1EFEA] px-4 py-2.5 rounded-xl font-medium hover:border-[#9098B0] transition-colors text-sm"
@@ -383,14 +457,12 @@ export default function Demo() {
                 )}
 
                 <div className="flex items-center justify-center gap-4 mt-5">
-                  
-                  <a href={monadExplorerUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={openExplorer}
                     className="text-[#5b6178] text-xs hover:text-[#9098B0] transition-colors"
                   >
                     View transaction
-                  </a>
+                  </button>
                   <span className="text-[#333850]">·</span>
                   <button
                     onClick={closeTransactionModal}
